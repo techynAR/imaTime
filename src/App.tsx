@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Minimize2, Maximize2, Info } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
+import { TimezoneSelect } from './components/TimezoneSelect';
 
 function App() {
   const [time, setTime] = useState(new Date());
   const [showSeconds, setShowSeconds] = useState(true);
-  const [theme, setTheme] = useState<ThemeKey>('oled');
+  const [theme, setTheme] = useState<ThemeKey>('OLED');
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [isMinimal, setIsMinimal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -66,15 +67,11 @@ function App() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <select
+            <TimezoneSelect
               value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className={`${currentTheme.bg} ${currentTheme.text} border border-opacity-20 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50`}
-            >
-              {Intl.supportedValuesOf('timeZone').map((tz) => (
-                <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
-              ))}
-            </select>
+              onChange={setTimezone}
+              theme={theme}
+            />
             
             <select
               value={theme}
