@@ -10,6 +10,7 @@ function App() {
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [isMinimal, setIsMinimal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -17,6 +18,26 @@ function App() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (err) {
+      console.error('Error toggling fullscreen:', err);
+    }
+  };
 
   const formatNumber = (num: number) => num.toString().padStart(2, '0');
 
@@ -37,9 +58,12 @@ function App() {
   return (
     <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col items-center justify-center transition-all duration-500 relative`}>
       <button
-        onClick={() => setIsMinimal(!isMinimal)}
+        onClick={() => {
+          setIsMinimal(!isMinimal);
+          toggleFullscreen();
+        }}
         className={`fixed bottom-8 left-1/2 -translate-x-1/2 p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-all duration-300 ${isMinimal ? 'opacity-30 hover:opacity-100' : 'opacity-75'}`}
-        title={isMinimal ? "Show controls" : "Hide controls"}
+        title={isMinimal ? "Show controls and exit fullscreen" : "Hide controls and enter fullscreen"}
       >
         {isMinimal ? <Maximize2 size={20} /> : <Minimize2 size={20} />}
       </button>
