@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Palette, Globe } from 'lucide-react';
+import { Clock, Palette, Globe, Minimize2, Maximize2 } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
 
 function App() {
@@ -7,6 +7,7 @@ function App() {
   const [showSeconds, setShowSeconds] = useState(true);
   const [theme, setTheme] = useState<ThemeKey>('oled');
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [isMinimal, setIsMinimal] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,9 +33,17 @@ function App() {
   const currentTheme = themes[theme];
 
   return (
-    <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col items-center justify-center transition-all duration-500`}>
+    <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col items-center justify-center transition-all duration-500 relative`}>
+      <button
+        onClick={() => setIsMinimal(!isMinimal)}
+        className={`absolute top-4 right-4 p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-opacity`}
+        title={isMinimal ? "Show controls" : "Hide controls"}
+      >
+        {isMinimal ? <Maximize2 size={20} /> : <Minimize2 size={20} />}
+      </button>
+
       <div className="w-full max-w-3xl px-4 py-8 space-y-8">
-        <div className="flex items-center justify-between px-4">
+        <div className={`flex items-center justify-between px-4 transition-opacity duration-300 ${isMinimal ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <div className="flex items-center space-x-4 opacity-80">
             <Clock className="w-8 h-8" />
             <h1 className="text-2xl font-light tracking-wider">PRECISE TIME</h1>
@@ -86,7 +95,7 @@ function App() {
           </div>
         </div>
 
-        <div className={`text-center mt-12 ${currentTheme.secondary} text-sm`}>
+        <div className={`text-center mt-12 ${currentTheme.secondary} text-sm transition-opacity duration-300 ${isMinimal ? 'opacity-0' : 'opacity-100'}`}>
           <p>Click the date to toggle seconds display</p>
         </div>
       </div>
