@@ -51,7 +51,7 @@ function App() {
           >
             <Clock className="w-8 h-8" />
             <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-light tracking-wider">IMA TIME</h1>
+              <h1 className="text-2xl font-light tracking-wider">imaTime</h1>
               <Info size={16} className="opacity-50 group-hover:opacity-100 transition-opacity" />
             </div>
             
