@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Minimize2, Maximize2, Info } from 'lucide-react';
+import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
 import { TimezoneSelect } from './components/TimezoneSelect';
 
@@ -11,6 +11,7 @@ function App() {
   const [isMinimal, setIsMinimal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -20,19 +21,33 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+    let timeout: number;
+    const handleMovement = () => {
+      setShowControls(true);
+      clearTimeout(timeout);
+      timeout = window.setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
     };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+
+    document.addEventListener('mousemove', handleMovement);
+    document.addEventListener('touchstart', handleMovement);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMovement);
+      document.removeEventListener('touchstart', handleMovement);
+      clearTimeout(timeout);
+    };
   }, []);
 
   const toggleFullscreen = async () => {
     try {
       if (!document.fullscreenElement) {
         await document.documentElement.requestFullscreen();
+        setIsFullscreen(true);
       } else {
         await document.exitFullscreen();
+        setIsFullscreen(false);
       }
     } catch (err) {
       console.error('Error toggling fullscreen:', err);
@@ -56,59 +71,54 @@ function App() {
   const currentTheme = themes[theme];
 
   return (
-    <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col items-center justify-center transition-all duration-500 relative`}>
-      <button
-        onClick={() => {
-          setIsMinimal(!isMinimal);
-          toggleFullscreen();
-        }}
-        className={`fixed bottom-8 left-1/2 -translate-x-1/2 p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-all duration-300 ${isMinimal ? 'opacity-30 hover:opacity-100' : 'opacity-75'}`}
-        title={isMinimal ? "Show controls and exit fullscreen" : "Hide controls and enter fullscreen"}
-      >
-        {isMinimal ? <Maximize2 size={20} /> : <Minimize2 size={20} />}
-      </button>
-
-      <div className="w-full max-w-3xl px-4 py-8 space-y-8">
-        <div className={`flex items-center justify-between px-4 transition-opacity duration-300 ${isMinimal ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-          <div 
-            className="flex items-center space-x-4 opacity-80 cursor-pointer group relative"
-            onClick={() => setShowInfo(!showInfo)}
-          >
-            <Clock className="w-8 h-8" />
-            <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-light tracking-wider">imaTime</h1>
-              <Info size={16} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+    <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col transition-all duration-500`}>
+      {/* Navbar */}
+      <div className={`transition-opacity duration-300 ${isMinimal ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div 
+              className="flex items-center space-x-4 opacity-80 cursor-pointer group relative"
+              onClick={() => setShowInfo(!showInfo)}
+            >
+              <Clock className="w-8 h-8" />
+              <div className="flex items-center space-x-2">
+                <h1 className="text-2xl font-light tracking-wider">imaTime</h1>
+                <Info size={16} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+              </div>
+              
+              {showInfo && (
+                <div className={`absolute top-full left-0 mt-4 p-4 rounded-lg ${currentTheme.bg} border border-opacity-20 shadow-lg z-10 w-72`}>
+                  <h3 className="font-medium mb-2">About the name</h3>
+                  <p className="text-sm opacity-80 leading-relaxed">
+                    "Ima" (今) means "now" in Japanese, reflecting the present moment. This name was chosen to honor the Japanese concept of "いまここ" (ima-koko) - the here and now - emphasizing mindful awareness of the present moment.
+                  </p>
+                </div>
+              )}
             </div>
             
-            {showInfo && (
-              <div className={`absolute top-full left-0 mt-4 p-4 rounded-lg ${currentTheme.bg} border border-opacity-20 shadow-lg z-10 w-72`}>
-                <h3 className="font-medium mb-2">About the name</h3>
-                <p className="text-sm opacity-80 leading-relaxed">
-                  "Ima" (今) means "now" in Japanese, reflecting the present moment. This name was chosen to honor the Japanese concept of "いまここ" (ima-koko) - the here and now - emphasizing mindful awareness of the present moment.
-                </p>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <TimezoneSelect
-              value={timezone}
-              onChange={setTimezone}
-              theme={theme}
-            />
-            
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value as ThemeKey)}
-              className={`${currentTheme.bg} ${currentTheme.text} border border-opacity-20 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50`}
-            >
-              {Object.keys(themes).map((t) => (
-                <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
-              ))}
-            </select>
+            <div className="flex items-center space-x-4">
+              <TimezoneSelect
+                value={timezone}
+                onChange={setTimezone}
+                theme={theme}
+              />
+              
+              <select
+                value={theme}
+                onChange={(e) => setTheme(e.target.value as ThemeKey)}
+                className={`${currentTheme.bg} ${currentTheme.text} border border-opacity-20 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50`}
+              >
+                {Object.keys(themes).map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
+      </div>
 
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-6">
           <div className="flex items-center justify-center">
             <div className="text-8xl font-light tracking-tight tabular-nums">
@@ -131,10 +141,24 @@ function App() {
             {date}
           </div>
         </div>
+      </div>
 
-        <div className={`text-center mt-12 ${currentTheme.secondary} text-sm transition-opacity duration-300 ${isMinimal ? 'opacity-0' : 'opacity-100'}`}>
-          <p>Click the date to toggle seconds display</p>
-        </div>
+      {/* Floating Controls */}
+      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 flex space-x-4 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+        <button
+          onClick={() => setIsMinimal(!isMinimal)}
+          className={`p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-all duration-300`}
+          title={isMinimal ? "Show UI" : "Hide UI"}
+        >
+          {isMinimal ? <Eye size={20} /> : <EyeOff size={20} />}
+        </button>
+        <button
+          onClick={toggleFullscreen}
+          className={`p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-all duration-300`}
+          title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+        >
+          {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+        </button>
       </div>
     </div>
   );
