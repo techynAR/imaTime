@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Palette, Globe, Minimize2, Maximize2 } from 'lucide-react';
+import { Clock, Minimize2, Maximize2, Info } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
 
 function App() {
@@ -8,6 +8,7 @@ function App() {
   const [theme, setTheme] = useState<ThemeKey>('oled');
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [isMinimal, setIsMinimal] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -36,7 +37,7 @@ function App() {
     <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col items-center justify-center transition-all duration-500 relative`}>
       <button
         onClick={() => setIsMinimal(!isMinimal)}
-        className={`absolute top-4 right-4 p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-opacity`}
+        className={`fixed bottom-8 left-1/2 -translate-x-1/2 p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-all duration-300 ${isMinimal ? 'opacity-30 hover:opacity-100' : 'opacity-75'}`}
         title={isMinimal ? "Show controls" : "Hide controls"}
       >
         {isMinimal ? <Maximize2 size={20} /> : <Minimize2 size={20} />}
@@ -44,9 +45,24 @@ function App() {
 
       <div className="w-full max-w-3xl px-4 py-8 space-y-8">
         <div className={`flex items-center justify-between px-4 transition-opacity duration-300 ${isMinimal ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-          <div className="flex items-center space-x-4 opacity-80">
+          <div 
+            className="flex items-center space-x-4 opacity-80 cursor-pointer group relative"
+            onClick={() => setShowInfo(!showInfo)}
+          >
             <Clock className="w-8 h-8" />
-            <h1 className="text-2xl font-light tracking-wider">PRECISE TIME</h1>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-2xl font-light tracking-wider">IMA TIME</h1>
+              <Info size={16} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+            </div>
+            
+            {showInfo && (
+              <div className={`absolute top-full left-0 mt-4 p-4 rounded-lg ${currentTheme.bg} border border-opacity-20 shadow-lg z-10 w-72`}>
+                <h3 className="font-medium mb-2">About the name</h3>
+                <p className="text-sm opacity-80 leading-relaxed">
+                  "Ima" (今) means "now" in Japanese, reflecting the present moment. This name was chosen to honor the Japanese concept of "いまここ" (ima-koko) - the here and now - emphasizing mindful awareness of the present moment.
+                </p>
+              </div>
+            )}
           </div>
           
           <div className="flex items-center space-x-4">
