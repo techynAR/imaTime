@@ -14,6 +14,19 @@ function App() {
   const [showControls, setShowControls] = useState(true);
 
   useEffect(() => {
+    // Fetch timezone from IP
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        if (data.timezone) {
+          setTimezone(data.timezone);
+        }
+      })
+      .catch(() => {
+        // Fallback to browser's timezone if IP lookup fails
+        console.log('Using browser timezone as fallback');
+      });
+
     const timer = setInterval(() => {
       setTime(new Date());
     }, 1000);
