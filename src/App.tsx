@@ -7,7 +7,7 @@ import { ThemeSelect } from './components/ThemeSelect';
 function App() {
   const [time, setTime] = useState(new Date());
   const [showSeconds, setShowSeconds] = useState(true);
-  const [theme, setTheme] = useState<ThemeKey>('OLED');
+  const [theme, setTheme] = useState<ThemeKey>('OLED Black');
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [isMinimal, setIsMinimal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
