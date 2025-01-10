@@ -182,7 +182,7 @@ function App() {
                 <div className={`w-4 h-4 border rounded flex items-center justify-center ${rememberTimezone ? currentTheme.accent : 'border-current'}`}>
                   {rememberTimezone && <Check size={12} />}
                 </div>
-                <span>Remember timezone</span>
+                <span>Remember custom timezone</span>
               </button>
             </div>
           </div>
