@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff } from 'lucide-react';
+import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff, Settings } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
 import { TimezoneSelect } from './components/TimezoneSelect';
 import { ThemeSelect } from './components/ThemeSelect';
@@ -15,11 +15,15 @@ function App() {
     const savedTheme = localStorage.getItem(THEME_KEY);
     return (savedTheme as ThemeKey) || 'OLED Black';
   });
-  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [timezone, setTimezone] = useState(() => {
+    const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return browserTimezone;
+  });
   const [isMinimal, setIsMinimal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Save theme to localStorage when it changes
   useEffect(() => {
@@ -90,10 +94,37 @@ function App() {
 
   return (
     <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col transition-all duration-500`}>
+      {/* Settings Icon */}
+      <div className="absolute top-4 right-4 z-30">
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          className={`p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-all duration-300`}
+        >
+          <Settings 
+            size={24} 
+            className={`transition-transform duration-500 ${showSettings ? 'rotate-180' : ''}`}
+          />
+        </button>
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className={`absolute top-full right-0 mt-2 p-4 rounded-lg ${currentTheme.bg} border border-opacity-20 shadow-lg space-y-4 min-w-[250px]`}>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Theme</label>
+              <ThemeSelect value={theme} onChange={setTheme} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Timezone</label>
+              <TimezoneSelect value={timezone} onChange={setTimezone} theme={theme} />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Navbar */}
       <div className={`transition-opacity duration-300 ${isMinimal ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div 
               className="flex items-center space-x-4 opacity-80 cursor-pointer group relative"
               onClick={() => setShowInfo(!showInfo)}
@@ -112,18 +143,6 @@ function App() {
                   </p>
                 </div>
               )}
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <TimezoneSelect
-                value={timezone}
-                onChange={setTimezone}
-                theme={theme}
-              />
-              <ThemeSelect
-                value={theme}
-                onChange={setTheme}
-              />
             </div>
           </div>
         </div>
