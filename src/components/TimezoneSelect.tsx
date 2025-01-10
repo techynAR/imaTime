@@ -156,16 +156,16 @@ export function TimezoneSelect({ value, onChange, theme }: Props) {
       </button>
 
       {isOpen && (
-        <div className={`absolute right-0 mt-2 w-72 rounded-lg shadow-lg ${currentTheme.bg} border border-opacity-20 z-20`}>
+        <div className="absolute right-0 mt-2 w-72 rounded-lg shadow-lg bg-gray-900 border border-gray-700 z-20">
           <div className="p-2">
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search country..."
-                className={`w-full pl-9 pr-3 py-1.5 rounded ${currentTheme.bg} ${currentTheme.text} border border-opacity-20 text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50`}
+                className="w-full pl-9 pr-3 py-1.5 rounded bg-gray-800 text-white border border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-gray-600 placeholder-gray-400"
               />
             </div>
           </div>
@@ -178,12 +178,12 @@ export function TimezoneSelect({ value, onChange, theme }: Props) {
                   onChange(tz.value);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-opacity-10 hover:bg-white ${
-                  tz.value === value ? `${currentTheme.accent} bg-opacity-5 bg-white` : ''
+                className={`w-full text-left px-3 py-2 text-sm text-white hover:bg-gray-800 ${
+                  tz.value === value ? 'bg-gray-800' : ''
                 }`}
               >
                 <span className="font-medium">{tz.name}</span>
-                <span className="ml-2 opacity-70">{tz.offset}</span>
+                <span className="ml-2 text-gray-400">{tz.offset}</span>
               </button>
             ))}
           </div>
