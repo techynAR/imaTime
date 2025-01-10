@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff, Settings } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
 import { TimezoneSelect } from './components/TimezoneSelect';
@@ -24,7 +24,10 @@ function App() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
-
+  
+  const settingsRef = useRef<HTMLDivElement>(null);
+  const settingsTimeoutRef = useRef<number>();
+  
   // Save theme to localStorage when it changes
   useEffect(() => {
     localStorage.setItem(THEME_KEY, theme);
@@ -41,6 +44,39 @@ function App() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Add this effect for click outside handling
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
+        setShowSettings(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Add this effect for auto-close timer
+  useEffect(() => {
+    if (showSettings) {
+      // Clear any existing timeout
+      if (settingsTimeoutRef.current) {
+        window.clearTimeout(settingsTimeoutRef.current);
+      }
+      
+      // Set new timeout
+      settingsTimeoutRef.current = window.setTimeout(() => {
+        setShowSettings(false);
+      }, 10000);
+    }
+
+    return () => {
+      if (settingsTimeoutRef.current) {
+        window.clearTimeout(settingsTimeoutRef.current);
+      }
+    };
+  }, [showSettings]);
 
   useEffect(() => {
     let timeout: number;
@@ -61,6 +97,16 @@ function App() {
       clearTimeout(timeout);
     };
   }, []);
+
+  // Add this handler to reset the timer on user interaction
+  const handleSettingsInteraction = () => {
+    if (settingsTimeoutRef.current) {
+      window.clearTimeout(settingsTimeoutRef.current);
+    }
+    settingsTimeoutRef.current = window.setTimeout(() => {
+      setShowSettings(false);
+    }, 10000);
+  };
 
   const toggleFullscreen = async () => {
     try {
@@ -94,8 +140,8 @@ function App() {
 
   return (
     <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col transition-all duration-500`}>
-      {/* Settings Icon */}
-      <div className="absolute top-4 right-4 z-30">
+      {/* Settings Icon and Panel */}
+      <div className={`absolute top-4 right-4 z-30 transition-opacity duration-300 ${isMinimal ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} ref={settingsRef}>
         <button
           onClick={() => setShowSettings(!showSettings)}
           className={`p-2 rounded-full ${currentTheme.secondary} hover:opacity-75 transition-all duration-300`}
@@ -106,9 +152,12 @@ function App() {
           />
         </button>
 
-        {/* Settings Panel */}
         {showSettings && (
-          <div className={`absolute top-full right-0 mt-2 p-4 rounded-lg ${currentTheme.bg} border border-opacity-20 shadow-lg space-y-4 min-w-[250px]`}>
+          <div 
+            className={`absolute top-full right-0 mt-2 p-4 rounded-lg ${currentTheme.bg} border border-opacity-20 shadow-lg space-y-4 min-w-[250px]`}
+            onMouseMove={handleSettingsInteraction}
+            onClick={handleSettingsInteraction}
+          >
             <div className="space-y-2">
               <label className="text-sm font-medium">Theme</label>
               <ThemeSelect value={theme} onChange={setTheme} />
