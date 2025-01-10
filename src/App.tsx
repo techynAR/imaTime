@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff, Settings } from 'lucide-react';
+import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff, Settings, Check } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
 import { TimezoneSelect } from './components/TimezoneSelect';
 import { ThemeSelect } from './components/ThemeSelect';
@@ -7,6 +7,7 @@ import { ThemeSelect } from './components/ThemeSelect';
 // Local storage keys
 const THEME_KEY = 'imaTime_theme';
 const TIMEZONE_KEY = 'imaTime_timezone';
+const REMEMBER_TIMEZONE_KEY = 'imaTime_remember_timezone';
 
 function App() {
   const [time, setTime] = useState(new Date());
@@ -16,8 +17,12 @@ function App() {
     return (savedTheme as ThemeKey) || 'OLED Black';
   });
   const [timezone, setTimezone] = useState(() => {
-    const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    return browserTimezone;
+    const rememberTimezone = localStorage.getItem(REMEMBER_TIMEZONE_KEY) === 'true';
+    const savedTimezone = localStorage.getItem(TIMEZONE_KEY);
+    return rememberTimezone && savedTimezone ? savedTimezone : Intl.DateTimeFormat().resolvedOptions().timeZone;
+  });
+  const [rememberTimezone, setRememberTimezone] = useState(() => {
+    return localStorage.getItem(REMEMBER_TIMEZONE_KEY) === 'true';
   });
   const [isMinimal, setIsMinimal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -33,10 +38,15 @@ function App() {
     localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
 
-  // Save timezone to localStorage when it changes
+  // Save timezone and remember setting to localStorage when they change
   useEffect(() => {
-    localStorage.setItem(TIMEZONE_KEY, timezone);
-  }, [timezone]);
+    if (rememberTimezone) {
+      localStorage.setItem(TIMEZONE_KEY, timezone);
+    } else {
+      localStorage.removeItem(TIMEZONE_KEY);
+    }
+    localStorage.setItem(REMEMBER_TIMEZONE_KEY, rememberTimezone.toString());
+  }, [timezone, rememberTimezone]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -165,6 +175,15 @@ function App() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Timezone</label>
               <TimezoneSelect value={timezone} onChange={setTimezone} theme={theme} />
+              <button
+                onClick={() => setRememberTimezone(!rememberTimezone)}
+                className={`flex items-center space-x-2 text-sm ${currentTheme.secondary} hover:opacity-75 transition-all duration-300 mt-1`}
+              >
+                <div className={`w-4 h-4 border rounded flex items-center justify-center ${rememberTimezone ? currentTheme.accent : 'border-current'}`}>
+                  {rememberTimezone && <Check size={12} />}
+                </div>
+                <span>Remember timezone</span>
+              </button>
             </div>
           </div>
         )}
