@@ -129,10 +129,30 @@ export function TimezoneSelect({ value, onChange, theme }: Props) {
 
   const timezones = getTimezoneList();
   const filteredTimezones = timezones.filter(tz => 
-    tz.name.toLowerCase().includes(search.toLowerCase())
+    tz.name.toLowerCase().includes(search.toLowerCase()) ||
+    tz.value.toLowerCase().includes(search.toLowerCase())
   );
 
-  const selectedTimezone = timezones.find(tz => tz.value === value) || timezones[0];
+  // Find the timezone info that matches the current value
+  const selectedTimezone = timezones.find(tz => tz.value === value);
+
+  // If we can't find a direct match, try to find a timezone with the same offset
+  const getTimezoneDisplay = () => {
+    if (selectedTimezone) {
+      return `${selectedTimezone.name} (${selectedTimezone.offset})`;
+    }
+
+    // If we can't find the exact timezone in our list, show the raw timezone name
+    const parts = value.split('/');
+    const cityName = parts[parts.length - 1].replace(/_/g, ' ');
+    const date = new Date();
+    const offset = -date.getTimezoneOffset();
+    const hours = Math.floor(Math.abs(offset) / 60);
+    const minutes = Math.abs(offset) % 60;
+    const offsetStr = `GMT${offset >= 0 ? '+' : '-'}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    
+    return `${cityName} (${offsetStr})`;
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -151,7 +171,7 @@ export function TimezoneSelect({ value, onChange, theme }: Props) {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center space-x-2 ${currentTheme.bg} ${currentTheme.text} border border-opacity-20 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 min-w-[200px] justify-between`}
       >
-        <span className="truncate">{selectedTimezone.name} ({selectedTimezone.offset})</span>
+        <span className="truncate">{getTimezoneDisplay()}</span>
         <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
@@ -164,7 +184,7 @@ export function TimezoneSelect({ value, onChange, theme }: Props) {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search country..."
+                placeholder="Search timezone..."
                 className="w-full pl-9 pr-3 py-1.5 rounded bg-gray-800 text-white border border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-gray-600 placeholder-gray-400"
               />
             </div>
