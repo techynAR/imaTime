@@ -15,10 +15,7 @@ function App() {
     const savedTheme = localStorage.getItem(THEME_KEY);
     return (savedTheme as ThemeKey) || 'OLED Black';
   });
-  const [timezone, setTimezone] = useState(() => {
-    const savedTimezone = localStorage.getItem(TIMEZONE_KEY);
-    return savedTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-  });
+  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [isMinimal, setIsMinimal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -35,19 +32,6 @@ function App() {
   }, [timezone]);
 
   useEffect(() => {
-    // Always fetch timezone from IP
-    fetch('https://ipapi.co/json/')
-      .then(res => res.json())
-      .then(data => {
-        if (data.timezone) {
-          setTimezone(data.timezone);
-        }
-      })
-      .catch(() => {
-        // Fallback to browser's timezone if IP lookup fails
-        console.log('Using browser timezone as fallback');
-      });
-
     const timer = setInterval(() => {
       setTime(new Date());
     }, 1000);
