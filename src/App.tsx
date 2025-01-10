@@ -4,18 +4,38 @@ import { themes, type ThemeKey } from './themes';
 import { TimezoneSelect } from './components/TimezoneSelect';
 import { ThemeSelect } from './components/ThemeSelect';
 
+// Local storage keys
+const THEME_KEY = 'imaTime_theme';
+const TIMEZONE_KEY = 'imaTime_timezone';
+
 function App() {
   const [time, setTime] = useState(new Date());
   const [showSeconds, setShowSeconds] = useState(true);
-  const [theme, setTheme] = useState<ThemeKey>('OLED Black');
-  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [theme, setTheme] = useState<ThemeKey>(() => {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    return (savedTheme as ThemeKey) || 'OLED Black';
+  });
+  const [timezone, setTimezone] = useState(() => {
+    const savedTimezone = localStorage.getItem(TIMEZONE_KEY);
+    return savedTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  });
   const [isMinimal, setIsMinimal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
+  // Save theme to localStorage when it changes
   useEffect(() => {
-    // Fetch timezone from IP
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+
+  // Save timezone to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem(TIMEZONE_KEY, timezone);
+  }, [timezone]);
+
+  useEffect(() => {
+    // Always fetch timezone from IP
     fetch('https://ipapi.co/json/')
       .then(res => res.json())
       .then(data => {
