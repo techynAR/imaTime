@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
 import { TimezoneSelect } from './components/TimezoneSelect';
+import { ThemeSelect } from './components/ThemeSelect';
 
 function App() {
   const [time, setTime] = useState(new Date());
@@ -115,16 +116,10 @@ function App() {
                 onChange={setTimezone}
                 theme={theme}
               />
-              
-              <select
+              <ThemeSelect
                 value={theme}
-                onChange={(e) => setTheme(e.target.value as ThemeKey)}
-                className={`${currentTheme.bg} ${currentTheme.text} border border-opacity-20 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50`}
-              >
-                {Object.keys(themes).map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
+                onChange={setTheme}
+              />
             </div>
           </div>
         </div>
