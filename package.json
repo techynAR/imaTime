@@ -1,7 +1,26 @@
 {
   "name": "imatime",
+  "version": "1.0.0",
+  "description": "A minimal, elegant time app inspired by Japanese mindfulness. View the current time across timezones with beautiful themes.",
+  "author": "techynAR <https://github.com/techynAR>",
+  "license": "MIT",
+  "homepage": "https://imatime.techynar.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/techynAR/imaTime.git"
+  },
+  "keywords": [
+    "clock",
+    "time",
+    "timezone",
+    "pomodoro",
+    "focus",
+    "japanese",
+    "minimal",
+    "react",
+    "typescript"
+  ],
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

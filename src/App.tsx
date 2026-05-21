@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff, Settings, Check } from 'lucide-react';
+import { Clock, Minimize2, Maximize2, Info, Eye, EyeOff, Settings, Check, Github } from 'lucide-react';
 import { themes, type ThemeKey } from './themes';
 import { TimezoneSelect } from './components/TimezoneSelect';
 import { ThemeSelect } from './components/ThemeSelect';
@@ -209,6 +209,16 @@ function App() {
                   <p className="text-sm opacity-80 leading-relaxed">
                     "Ima" (今) means "now" in Japanese, reflecting the present moment. This name was chosen to honor the Japanese concept of "いまここ" (ima-koko) - the here and now - emphasizing mindful awareness of the present moment.
                   </p>
+                  <a
+                    href="https://github.com/techynAR/imaTime"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center space-x-2 mt-3 text-sm ${currentTheme.secondary} hover:opacity-100 opacity-70 transition-opacity`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Github size={14} />
+                    <span>View on GitHub · contribute</span>
+                  </a>
                 </div>
               )}
             </div>
