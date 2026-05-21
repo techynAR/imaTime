@@ -232,11 +232,11 @@ function App() {
           <div className="flex items-center justify-center">
             <div className="text-8xl font-light tracking-tight tabular-nums">
               <span className={`transition-all duration-300 ${currentTheme.hover}`}>{hours}</span>
-              <span className="animate-pulse">:</span>
+              <span>:</span>
               <span className={`transition-all duration-300 ${currentTheme.hover}`}>{minutes}</span>
               {showSeconds && (
                 <>
-                  <span className="animate-pulse">:</span>
+                  <span>:</span>
                   <span className={`transition-all duration-300 ${currentTheme.hover}`}>{seconds}</span>
                 </>
               )}
