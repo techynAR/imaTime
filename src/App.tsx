@@ -149,7 +149,7 @@ function App() {
   const currentTheme = themes[theme];
 
   return (
-    <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col transition-all duration-500`}>
+    <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex flex-col transition-all duration-500 ${isFullscreen && !showControls ? 'cursor-none' : ''}`}>
       {/* Settings Icon and Panel */}
       <div className={`absolute top-4 right-4 z-30 transition-opacity duration-300 ${isMinimal ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} ref={settingsRef}>
         <button
